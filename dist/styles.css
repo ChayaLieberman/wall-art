@@ -459,7 +459,7 @@ img {
 
 /* Lightbox */
 .featured-gallery { background: var(--surface); padding: clamp(56px, 8vw, 112px) 0; }
-.featured-gallery .section-head { text-align: right; max-width: none; margin-bottom: 40px; }
+.featured-gallery .section-head { text-align: center; max-width: none; margin-bottom: 40px; }
 .featured-gallery .eyebrow { color: var(--bronze); font-size: 0.85rem; }
 .featured-gallery h2 { font-size: clamp(2rem, 3.4vw, 3.25rem); font-weight: 500; line-height: 1.2; }
 .featured-gallery .section-head p { font-size: 1.05rem; }
@@ -2060,10 +2060,7 @@ body { background-color: var(--surface); }
   .catalog-process-text h3 { margin-bottom: 10px; }
   .catalog-process-text p { font-size: 1.1rem; }
 }
-.quote-options[hidden], #quote-share[hidden] { display: none; }
-.quote-options { display: grid; gap: 12px; padding: 18px; border: 1px solid #d5c2a7; border-radius: 6px; background: #f4ecdf; }
-.quote-options .btn { width: 100%; white-space: normal; background: #fffaf3; border: 1px solid #b89a74; color: #694b2c; font-size: .95rem; }
-.quote-options p, #quote-status { margin: 0; font-size: .9rem; line-height: 1.6; color: var(--ink-soft); }
+#quote-status { margin: 0; font-size: .9rem; line-height: 1.6; color: var(--ink-soft); }
 #quote-status:empty { display: none; }
 #config-send:disabled { opacity: .65; cursor: wait; }
 #how-it-works, #customize { scroll-margin-top: 100px; }

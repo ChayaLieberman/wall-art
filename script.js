@@ -734,44 +734,25 @@ document.getElementById('config-save').addEventListener('click', async () => {
   try { downloadDesign(await designBlob(await exportDesignCanvas())); }
   catch { document.getElementById('quote-status').textContent = 'לא הצלחנו להכין את התמונה. נסו שוב או צרו קשר דרך פרטי הקשר באתר.'; }
 });
-let quoteFile = null;
-const quotePanel = document.getElementById('quote-options');
 const quoteStatus = document.getElementById('quote-status');
-const quoteShare = document.getElementById('quote-share');
-const quoteEmail = document.getElementById('quote-email');
 const quoteSubject = 'בקשה להצעת מחיר - חריטה אומנותית בקיר';
 const quoteMessage = 'שלום מרדכי, עיצבתי הדמיה באתר ואשמח לקבל הצעת מחיר. תודה!';
-quoteEmail.href = 'mailto:mlib161461@gmail.com?subject=' + encodeURIComponent(quoteSubject) + '&body=' + encodeURIComponent(quoteMessage);
-function invalidateQuote() {
-  quoteFile = null;
-  quotePanel.hidden = true;
-  quoteStatus.textContent = '';
-}
-new MutationObserver(invalidateQuote).observe(canvasEl, {subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['style','src','class']});
+const quoteMailto = 'mailto:mlib161461@gmail.com?subject=' + encodeURIComponent(quoteSubject) + '&body=' + encodeURIComponent(quoteMessage);
 document.getElementById('config-send').addEventListener('click', async () => {
-  if (!canvasEl.querySelector('.layer')) { quoteStatus.textContent = 'הוסיפו לפחות רכיב אחד לעיצוב לפני בקשת הצעת מחיר.'; return; }
   const button = document.getElementById('config-send');
+  if (!canvasEl.querySelector('.layer')) { quoteStatus.textContent = 'הוסיפו לפחות רכיב אחד לעיצוב לפני בקשת הצעת מחיר.'; return; }
   button.disabled = true;
-  quotePanel.hidden = true;
   quoteStatus.textContent = 'מכינים את ההדמיה…';
   try {
     const blob = await designBlob(await exportDesignCanvas());
-    quoteFile = new File([blob], 'עיצוב-אישי.png', {type:'image/png'});
-    quoteShare.hidden = !(navigator.share && navigator.canShare && navigator.canShare({files:[quoteFile]}));
-    quotePanel.hidden = false;
-    quoteStatus.textContent = quoteShare.hidden ? 'בחרו פתיחת אימייל. ההדמיה תורד באותה לחיצה.' : 'אפשר לשתף את התמונה ישירות לאפליקציה לבחירתכם. לשליחה למרדכי: mlib161461@gmail.com';
-  } catch { quoteStatus.textContent = 'לא הצלחנו להכין את ההדמיה. נסו שוב או פנו דרך יצירת הקשר באתר.'; }
-  finally { button.disabled = false; }
-});
-quoteShare.addEventListener('click', async () => {
-  if (!quoteFile) return;
-  try { await navigator.share({files:[quoteFile], title:quoteSubject, text:quoteMessage + ' כתובת לשליחה: mlib161461@gmail.com'}); }
-  catch (error) { if (error.name !== 'AbortError') quoteStatus.textContent = 'השיתוף לא זמין כרגע. אפשר להשתמש באפשרות האימייל שלמטה.'; }
-});
-quoteEmail.addEventListener('click', event => {
-  if (!quoteFile) { event.preventDefault(); quoteStatus.textContent = 'העיצוב השתנה. לחצו שוב על קבלת הצעת מחיר.'; return; }
-  downloadDesign(quoteFile);
-  quoteStatus.textContent = 'ההדמיה הורדה. צרפו אותה לאימייל לפני השליחה. אם האימייל לא נפתח, שלחו אל mlib161461@gmail.com';
+    downloadDesign(blob);
+    window.location.href = quoteMailto;
+    quoteStatus.textContent = 'ההדמיה הורדה. פתחנו עבורכם אימייל מוכן — צרפו אליו את הקובץ שהורד ושלחו.';
+  } catch {
+    quoteStatus.textContent = 'לא הצלחנו להכין את ההדמיה. נסו שוב או פנו דרך יצירת הקשר באתר.';
+  } finally {
+    button.disabled = false;
+  }
 });
 
 // The catalogue uses a direct PDF link in the HTML.
