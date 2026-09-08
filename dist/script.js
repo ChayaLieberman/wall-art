@@ -1,6 +1,3 @@
-// Paste the real catalog link here once it exists; leave empty to show the "coming soon" note instead.
-const CATALOG_URL = "";
-
 document.getElementById("year").textContent = new Date().getFullYear();
 
 const navToggle = document.getElementById("nav-toggle");
@@ -10,7 +7,7 @@ navToggle.addEventListener("click", () => {
   navToggle.setAttribute("aria-expanded", isOpen);
 });
 navLinks.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => navLinks.classList.remove("is-open"));
+  link.addEventListener("click", () => { navLinks.classList.remove("is-open"); navToggle.setAttribute("aria-expanded", "false"); });
 });
 
 const lightbox = document.getElementById("lightbox");
@@ -719,58 +716,65 @@ async function exportDesignCanvas() {
   return canvas;
 }
 
-document.getElementById("config-save").addEventListener("click", async () => {
-  if (!canvasEl.querySelector(".layer")) {
-    alert("הוסיפו לפחות רכיב אחד לעיצוב לפני השמירה.");
-    return;
-  }
+function designBlob(canvas) {
+  return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('empty image')), 'image/png'));
+}
+function downloadDesign(blob) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'חריטה-אמנותית-עיצוב-אישי.png';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+document.getElementById('config-save').addEventListener('click', async () => {
+  if (!canvasEl.querySelector('.layer')) { alert('הוסיפו לפחות רכיב אחד לעיצוב לפני השמירה.'); return; }
+  try { downloadDesign(await designBlob(await exportDesignCanvas())); }
+  catch { document.getElementById('quote-status').textContent = 'לא הצלחנו להכין את התמונה. נסו שוב או צרו קשר דרך פרטי הקשר באתר.'; }
+});
+let quoteFile = null;
+const quotePanel = document.getElementById('quote-options');
+const quoteStatus = document.getElementById('quote-status');
+const quoteShare = document.getElementById('quote-share');
+const quoteEmail = document.getElementById('quote-email');
+const quoteSubject = 'בקשה להצעת מחיר - חריטה אומנותית בקיר';
+const quoteMessage = 'שלום מרדכי, עיצבתי הדמיה באתר ואשמח לקבל הצעת מחיר. תודה!';
+quoteEmail.href = 'mailto:mlib161461@gmail.com?subject=' + encodeURIComponent(quoteSubject) + '&body=' + encodeURIComponent(quoteMessage);
+function invalidateQuote() {
+  quoteFile = null;
+  quotePanel.hidden = true;
+  quoteStatus.textContent = '';
+}
+new MutationObserver(invalidateQuote).observe(canvasEl, {subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['style','src','class']});
+document.getElementById('config-send').addEventListener('click', async () => {
+  if (!canvasEl.querySelector('.layer')) { quoteStatus.textContent = 'הוסיפו לפחות רכיב אחד לעיצוב לפני בקשת הצעת מחיר.'; return; }
+  const button = document.getElementById('config-send');
+  button.disabled = true;
+  quotePanel.hidden = true;
+  quoteStatus.textContent = 'מכינים את ההדמיה…';
   try {
-    const canvas = await exportDesignCanvas();
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error("empty blob");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "חריטה-אמנותית-עיצוב-אישי.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-    }, "image/png");
-  } catch (err) {
-    alert("שמירת התמונה לא זמינה בעת פתיחת הקובץ ישירות מהמחשב. פתחו את האתר המקוון כדי לשמור את ההדמיה, או צלמו מסך.");
-  }
+    const blob = await designBlob(await exportDesignCanvas());
+    quoteFile = new File([blob], 'עיצוב-אישי.png', {type:'image/png'});
+    quoteShare.hidden = !(navigator.share && navigator.canShare && navigator.canShare({files:[quoteFile]}));
+    quotePanel.hidden = false;
+    quoteStatus.textContent = quoteShare.hidden ? 'בחרו פתיחת אימייל. ההדמיה תורד באותה לחיצה.' : 'אפשר לשתף את התמונה ישירות לאפליקציה לבחירתכם. לשליחה למרדכי: mlib161461@gmail.com';
+  } catch { quoteStatus.textContent = 'לא הצלחנו להכין את ההדמיה. נסו שוב או פנו דרך יצירת הקשר באתר.'; }
+  finally { button.disabled = false; }
+});
+quoteShare.addEventListener('click', async () => {
+  if (!quoteFile) return;
+  try { await navigator.share({files:[quoteFile], title:quoteSubject, text:quoteMessage + ' כתובת לשליחה: mlib161461@gmail.com'}); }
+  catch (error) { if (error.name !== 'AbortError') quoteStatus.textContent = 'השיתוף לא זמין כרגע. אפשר להשתמש באפשרות האימייל שלמטה.'; }
+});
+quoteEmail.addEventListener('click', event => {
+  if (!quoteFile) { event.preventDefault(); quoteStatus.textContent = 'העיצוב השתנה. לחצו שוב על קבלת הצעת מחיר.'; return; }
+  downloadDesign(quoteFile);
+  quoteStatus.textContent = 'ההדמיה הורדה. צרפו אותה לאימייל לפני השליחה. אם האימייל לא נפתח, שלחו אל mlib161461@gmail.com';
 });
 
-document.getElementById("config-send").addEventListener("click", () => {
-  if (!canvasEl.querySelector(".layer")) {
-    alert("הוסיפו לפחות רכיב אחד לעיצוב לפני השליחה.");
-    return;
-  }
-  const proceed = confirm(
-    'שימו לב: יש להוריד קודם את תמונת העיצוב (כפתור "הורדת ההדמיה"), ולצרף אותה ידנית להודעת המייל שתיפתח כעת — התמונה אינה מצורפת אוטומטית.\n\nלפתוח את המייל?'
-  );
-  if (!proceed) return;
-  const subject = encodeURIComponent("בקשה להצעת מחיר - חריטה אמנותית בקיר");
-  const body = encodeURIComponent(
-    "שלום מרדכי,\n\nעיצבתי עיצוב אישי באתר ואשמח לקבל הצעת מחיר.\n\n" +
-    "יש לצרף כאן ידנית את קובץ התמונה שהורדתי מהאתר (ההורדה לא מצורפת אוטומטית להודעה).\n\nתודה!"
-  );
-  window.location.href = `mailto:mlib161461@gmail.com?subject=${subject}&body=${body}`;
-});
-
-const catalogBtn = document.getElementById("catalog-btn");
-const catalogNote = document.getElementById("catalog-note");
-catalogBtn.addEventListener("click", (e) => {
-  if (!CATALOG_URL) {
-    e.preventDefault();
-    catalogNote.classList.add("is-visible");
-  } else {
-    catalogBtn.href = CATALOG_URL;
-    catalogBtn.target = "_blank";
-    catalogBtn.rel = "noopener";
-  }
-});
+// The catalogue uses a direct PDF link in the HTML.
 
 // Guided choices use the existing layers, history and draft format.
 
@@ -869,3 +873,24 @@ if (galleryGrid) {
   }
 }
 syncGuidedChoices();
+
+const processSection = document.querySelector('.how-it-works');
+if (processSection) {
+  const processItems = [...processSection.querySelectorAll('.process-steps li')];
+  processItems.forEach((item, index) => item.style.setProperty('--process-delay', `${index * 110}ms`));
+  processSection.classList.add('process-motion-ready');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if ('IntersectionObserver' in window) {
+      const processObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          processItems.forEach((item) => item.classList.add('is-visible'));
+          observer.disconnect();
+        });
+      }, { threshold: .2 });
+      processObserver.observe(processSection);
+    } else {
+      processItems.forEach((item) => item.classList.add('is-visible'));
+    }
+  }));
+}

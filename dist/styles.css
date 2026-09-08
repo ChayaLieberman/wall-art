@@ -342,7 +342,7 @@ img {
 .hero-bottom a { text-decoration: none; }
 .hero-bottom a span { margin-inline-start: 16px; }
 .hero a:focus-visible { outline: 2px solid #806344; outline-offset: 5px; }
-#gallery, #about, #contact { scroll-margin-top: 100px; }
+#gallery, #about, #contact, #catalog { scroll-margin-top: 100px; }
 @media (max-width: 760px) {
   .hero-layout { grid-template-columns: 1fr; gap: 32px; }
   .hero-copy { padding: 0; }
@@ -351,10 +351,12 @@ img {
   .hero-description { max-width: 440px; font-size: 1.05rem; }
   .hero-signature { margin-top: 28px; }
   .hero-artwork { width: 100%; max-width: 520px; justify-self: center; }
+  .hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+  .hero-actions .btn { width: 100%; min-height: 54px; justify-content: center; padding: 13px 12px; white-space: nowrap; }
 }
 @media (max-width: 380px) {
-  .hero-actions { align-items: stretch; flex-direction: column; gap: 18px; }
-  .hero-primary { justify-content: space-between; }
+  .hero-actions { gap: 8px; }
+  .hero-actions .btn { font-size: .9rem; padding-inline: 8px; }
 }
 
 /* ===== About ===== */
@@ -569,6 +571,17 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+}
+.lightbox-nav svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .lightbox-nav:hover {
@@ -1872,3 +1885,187 @@ body { background-color: var(--surface); }
   }
   .site-header .nav-links a { border-bottom-color: rgba(205, 182, 147, .18); }
 }
+
+/* Catalogue typography on a smooth ivory background. */
+.catalog-process { padding: clamp(56px, 7vw, 96px) 24px; background: #f1e9dd; color: var(--ink); }
+.catalog-process-text { max-width: var(--max-width); margin: 0 auto; text-align: center; }
+.catalog-process-text h2 { font-family: 'David Libre', serif; font-size: clamp(2.8rem, 5vw, 4.4rem); line-height: 1.1; margin: 0 0 clamp(36px, 5vw, 64px); }
+.catalog-process-text ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0; }
+.catalog-process-text li { padding: 8px 24px; }
+.catalog-process-text li + li { border-inline-start: 1px solid #d3c3ad; }
+.catalog-process-text h3 { font-family: 'David Libre', serif; color: #89673e; font-size: clamp(2.1rem, 3.5vw, 3rem); margin: 0 0 12px; line-height: 1.1; }
+.catalog-process-text p { max-width: 245px; margin: 0 auto; font-size: 1.15rem; line-height: 1.55; }
+.catalog-process-text small { display: block; margin-top: 10px; color: var(--ink-soft); font-size: .9rem; }
+@media (max-width: 760px) {
+  .catalog-process-text ol { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 36px; }
+  .catalog-process-text li:nth-child(3) { border-inline-start: 0; }
+}
+@media (max-width: 440px) {
+  .catalog-process-text ol { grid-template-columns: 1fr; gap: 24px; }
+  .catalog-process-text li { padding: 0; }
+  .catalog-process-text li + li { border-inline-start: 0; border-top: 1px solid #d3c3ad; padding-top: 24px; }
+}
+/* Visual rhythm for the four-step process. */
+.process-heading h2 {
+  font-weight: 700;
+  color: var(--ink);
+}
+.process-steps h3 {
+  color: #89673e;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+.process-steps {
+  position: relative;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: none;
+  gap: 0;
+}
+.process-steps::before {
+  display: none;
+}
+.process-steps li,
+.process-steps li:nth-child(3) {
+  display: block;
+  padding: 4px clamp(18px,2.5vw,34px);
+  border: 0;
+  border-inline-start: 1px solid #cbbba5;
+  text-align: center;
+}
+.process-steps li:first-child {
+  border-inline-start: 0;
+}
+.process-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  border: 1px solid #b4824d;
+  border-radius: 50%;
+  background: #eadcc7;
+  color: #89673e;
+}
+.process-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.process-motion-ready .process-steps li {
+  opacity: 0;
+  transform: translateY(46px);
+  transition: opacity .72s ease, transform .78s cubic-bezier(.22,.61,.36,1);
+  transition-delay: var(--process-delay, 0ms);
+}
+.process-motion-ready .process-steps li.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.process-motion-ready .process-icon {
+  transform: scale(.78);
+  transition: transform .55s cubic-bezier(.2,.8,.2,1);
+  transition-delay: calc(var(--process-delay, 0ms) + 180ms);
+}
+.process-motion-ready .process-steps li.is-visible .process-icon {
+  transform: scale(1);
+}
+@media (max-width: 860px) {
+  .process-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .process-steps li:nth-child(3) { border-inline-start: 0; }
+}
+@media (max-width: 540px) {
+  .process-steps { grid-template-columns: 1fr; gap: 34px; }
+  .process-steps li,
+  .process-steps li:nth-child(3) {
+    padding: 0;
+    border: 0;
+    text-align: right;
+  }
+  .process-icon { width: 58px; height: 58px; margin: 0 0 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-motion-ready .process-steps li { opacity: 1; transform: none; transition: none; }
+  .process-motion-ready .process-icon { transform: none; transition: none; }
+}
+
+/* Calm, coordinated section backgrounds and a clearly visible catalogue link. */
+.hero::before, .featured-gallery::before, .contact-finale::before { background: #f7f2e9; }
+.designer-section { background: #faf7f1; }
+#halacha { background: #f1e9dd; }
+#halacha::after { background: none; }
+#catalog { background: #f7f2e9; padding: clamp(40px, 6vw, 72px) 0; }
+#catalog .catalog-card { background: #e9decd; color: var(--ink); border: 1px solid #d9c8b1; border-radius: 8px; padding: clamp(28px, 4vw, 48px); box-shadow: none; }
+#catalog .catalog-card h2 { color: var(--ink); margin: 0; font-size: clamp(2rem, 3.5vw, 2.8rem); }
+#catalog-btn { flex-shrink: 0; background: #785735; border: 1px solid #785735; color: #fff; min-height: 50px; padding: 13px 28px; border-radius: 5px; box-shadow: 0 4px 12px rgba(74, 51, 29, .12); }
+#catalog-btn:hover { background: #5f4228; border-color: #5f4228; transform: translateY(-2px); }
+#catalog-btn:focus-visible { outline: 3px solid #785735; outline-offset: 5px; }
+@media (max-width: 600px) {
+  #catalog .catalog-card { flex-direction: column; text-align: center; gap: 24px; }
+  #catalog-btn { width: 100%; max-width: 300px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #catalog-btn:hover { transform: none; }
+}
+/* Preserve the actual catalogue letterforms; soften its pale plaster into ivory. */
+.catalog-process { position: relative; padding: 0 0 clamp(24px, 4vw, 56px); background: #f1e9dd; }
+.catalog-process-art { display: block; width: 100%; height: auto; filter: brightness(1.12) contrast(1.2); mix-blend-mode: multiply; }
+.catalog-process-text { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#catalog .catalog-card { justify-content: center; }
+
+/* Bronze separators aligned with the original catalogue columns. */
+.catalog-process-visual { position: relative; }
+.catalog-process-divider { position: absolute; top: 55%; bottom: 8.5%; width: 2px; background: #a58b6c; pointer-events: none; }
+/* A single aligned stack for choosing and adding lettering. */
+.designer-section .text-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 8px 0 24px; }
+.text-controls-label { color: var(--ink-soft); font-size: .9rem; font-weight: 600; }
+.text-controls #text-style-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 5px; background: #eee5d8; border: 1px solid #ded0bc; border-radius: 7px; }
+.designer-section .text-controls .chip { min-width: 0; min-height: 44px; padding: 10px 16px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--ink-soft); }
+.designer-section .text-controls .chip:hover { background: #f7f2e9; color: var(--ink); }
+.designer-section .text-controls .chip.is-active { background: #fffaf3; border-color: #b89a74; color: #694b2c; box-shadow: 0 2px 5px rgba(70, 48, 26, .07); }
+.text-controls #designer-add-text { width: 100%; min-height: 48px; margin: 4px 0 0; padding: 12px 20px; border-radius: 5px; font-size: 1rem; gap: 10px; }
+.text-controls #designer-add-text span { font-size: 1.3rem; font-weight: 400; line-height: 1; }
+.category-content.text-controls .designer-hint { margin: 0; text-align: center; font-size: .9rem; line-height: 1.65; color: var(--ink-soft); }
+/* Secondary action, quieter than the quote request. */
+.designer-section .text-controls #designer-add-text {
+  justify-self: center;
+  width: auto;
+  min-height: 40px;
+  padding: 9px 22px;
+  background: #f4ecdf;
+  border: 1px solid #c5ac89;
+  color: #765535;
+  font-size: .95rem;
+  box-shadow: none;
+}
+.designer-section .text-controls #designer-add-text:hover {
+  background: #eaddc9;
+  border-color: #a88962;
+}
+/* Trim the thin scan edge on the right of the catalogue artwork. */
+.catalog-process-art { clip-path: inset(0 2px 0 0); }
+/* Mobile layout keeps the catalogue's original letterforms at a readable size. */
+.process-mobile-lettering { display: block; width: 180px; height: 70px; margin: 0 auto; filter: brightness(1.12) contrast(1.2); mix-blend-mode: multiply; }
+.catalog-process-text h2 .process-mobile-lettering { width: min(100%, 310px); height: auto; }
+@media (max-width: 760px) {
+  .catalog-process { padding: 44px 22px; }
+  .catalog-process-visual { display: none; }
+  .catalog-process-text { position: static; width: auto; height: auto; margin: 0 auto; overflow: visible; clip-path: none; white-space: normal; }
+  .catalog-process-text h2 { margin-bottom: 32px; }
+  .catalog-process-text h3 { margin-bottom: 10px; }
+  .catalog-process-text p { font-size: 1.1rem; }
+}
+.quote-options[hidden], #quote-share[hidden] { display: none; }
+.quote-options { display: grid; gap: 12px; padding: 18px; border: 1px solid #d5c2a7; border-radius: 6px; background: #f4ecdf; }
+.quote-options .btn { width: 100%; white-space: normal; background: #fffaf3; border: 1px solid #b89a74; color: #694b2c; font-size: .95rem; }
+.quote-options p, #quote-status { margin: 0; font-size: .9rem; line-height: 1.6; color: var(--ink-soft); }
+#quote-status:empty { display: none; }
+#config-send:disabled { opacity: .65; cursor: wait; }
+#how-it-works, #customize { scroll-margin-top: 100px; }
+
+#customize { background: #faf7f1; }
