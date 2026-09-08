@@ -747,7 +747,8 @@ document.getElementById('config-send').addEventListener('click', async () => {
     const blob = await designBlob(await exportDesignCanvas());
     downloadDesign(blob);
     window.location.href = quoteMailto;
-    quoteStatus.textContent = 'ההדמיה הורדה. פתחנו עבורכם אימייל מוכן — צרפו אליו את הקובץ שהורד ושלחו.';
+    quoteStatus.textContent = '';
+    alert('ההדמיה הורדה. פתחנו עבורכם אימייל מוכן — צרפו אליו את הקובץ שהורד ושלחו.');
   } catch {
     quoteStatus.textContent = 'לא הצלחנו להכין את ההדמיה. נסו שוב או פנו דרך יצירת הקשר באתר.';
   } finally {
