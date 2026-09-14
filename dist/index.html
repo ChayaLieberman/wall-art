@@ -83,7 +83,7 @@
           </div>
         </div>
         <figure class="hero-artwork">
-          <div class="hero-photo-wrap"><img class="hero-img" src="images/tower-david.jpg" fetchpriority="high"
+          <div class="hero-photo-wrap"><img class="hero-img" src="images/tower-david-catalog-hd.png" fetchpriority="high"
               alt="חריטת מגדל דוד בעבודת יד בקיר"></div>
         </figure>
       </div>
@@ -116,8 +116,8 @@
             <img src="images/temple-led-frame.jpg" alt="דגם בית המקדש עם מסגרת תאורת LED" loading="lazy">
           </figure>
 
-          <figure class="gallery-item" data-full="images/tower-david.jpg">
-            <img src="images/tower-david.jpg" alt="דגם מגדל דוד" loading="lazy">
+          <figure class="gallery-item" data-full="images/tower-david-catalog-hd.png">
+            <img src="images/tower-david-catalog-hd.png" alt="דגם מגדל דוד" loading="lazy">
           </figure>
         </div>
       </div>
@@ -163,22 +163,23 @@
         <div class="designer">
           <div class="designer-canvas-wrap">
             <div class="designer-wall-preview">
+              <button type="button" class="btn-clear canvas-clear-button" id="designer-clear">נקה הכל</button>
               <div class="designer-canvas" id="designer-canvas">
                 <p class="designer-empty-hint" id="designer-empty-hint">התחילו מבחירת שטח אמה על אמה &larr;</p>
               </div>
             </div>
-            <p class="designer-draft-notice" id="designer-draft-notice" hidden>
-              טיוטה קודמת שוחזרה אוטומטית ·
-              <button type="button" id="designer-draft-discard">התחלה מחדש</button>
-            </p>
-            <div class="designer-preview-footer"><span>תצוגה מקדימה · להמחשה בלבד</span></div>
-            <p class="designer-hint">גררו להזזה, משכו בידיות לשינוי גודל ולחצו על ✎ לעריכת כיתוב.</p>
+            <div class="designer-preview-actions">
+            <div class="config-actions">
+              <button type="button" class="btn-clear" id="config-save"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5"/></svg><span>הורדת ההדמיה</span></button>
+              <button type="button" class="btn btn-primary" id="config-send">לקבלת הצעת מחיר ←</button>
+            </div>
+            <p id="quote-status" role="status" aria-live="polite"></p>
+            <p class="config-disclaimer">* כלי הדמיה חופשי לתכנון ראשוני בלבד. העבודה
+              בפועל נעשית ביד ועשויה להיות שונה מההדמיה.</p>
+            </div>
           </div>
 
           <div class="designer-controls">
-            <div class="designer-panel-heading"><span>הפרטים שעושים את היצירה</span>
-              <p>פותחים קטגוריה ובוחרים. ההדמיה מתעדכנת לצדכם.</p>
-            </div>
             <div class="designer-accordion">
               <details class="designer-category" name="designer-options" open>
                 <summary><span class="category-number">01</span><span>שטח</span><span class="category-toggle"
@@ -201,8 +202,7 @@
                         src="images/paintings/temple-painting.jpg" alt="" loading="lazy"><span>בית המקדש</span></button>
                     <button type="button" class="model-option" data-model="kotel" aria-pressed="false"><img
                         src="images/paintings/kotel-painting.jpg" alt="" loading="lazy"><span>הכותל</span></button>
-                  </div><label class="upload-label">או העלו ציור משלכם<input type="file" id="designer-upload"
-                      accept="image/*"></label>
+                  </div><label class="upload-label designer-upload-button"><input type="file" id="designer-upload" accept="image/*" aria-label="העלאת ציור משלכם"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></svg><span>העלאת ציור משלכם</span></label>
                 </div>
               </details>
               <details class="designer-category" name="designer-options">
@@ -237,19 +237,8 @@
                 </div>
               </details>
             </div>
-            <div class="config-actions">
-              <button type="button" class="btn-clear" id="config-save">הורדת ההדמיה</button>
-              <button type="button" class="btn btn-primary" id="config-send">לקבלת הצעת מחיר ←</button>
-            </div>
-            <p class="designer-send-note">ההדמיה תורד למכשיר ויפתח אימייל מוכן לשליחה — יש לצרף אליו את הקובץ שהורד.</p>
-            <p id="quote-status" role="status" aria-live="polite"></p>
-            <div class="config-actions config-actions-secondary">
-              <button type="button" class="btn-clear" id="config-undo">ביטול פעולה</button>
-              <button type="button" class="btn-clear" id="designer-clear">התחלה מחדש</button>
-            </div>
-            <p class="config-disclaimer">* כלי הדמיה חופשי לתכנון ראשוני בלבד. העבודה
-              בפועל נעשית ביד ועשויה להיות שונה מההדמיה.</p>
           </div>
+
         </div>
       </div>
     </section>
@@ -377,11 +366,11 @@
 
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="lightbox-close" aria-label="סגירה">&times;</button>
-    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="התמונה הקודמת"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="התמונה הקודמת"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
     <div class="lightbox-stage" id="lightbox-stage">
       <img src="" alt="" id="lightbox-img" draggable="false">
     </div>
-    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="התמונה הבאה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="התמונה הבאה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
     <p class="lightbox-hint">גלגלת עכבר / צביטה להגדלה · גרירה להזזה</p>
   </div>
 

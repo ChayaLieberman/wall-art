@@ -1,3 +1,11 @@
+/* Decorative carving lives outside the editable/exported design layers. */
+.carving-scene { position: absolute; z-index: 90; pointer-events: none; }
+.carving-tool { position: absolute; width: clamp(78px, 13vw, 125px); transform: translate(-25%, -12%); transition: left .22s cubic-bezier(.4,0,.2,1), top .22s cubic-bezier(.4,0,.2,1); }
+.carving-tool svg { display: block; width: 100%; overflow: visible; filter: drop-shadow(2px 5px 3px rgba(45,31,20,.2)); }
+.carving-swing { transform-origin: 95px 95px; }
+.carving-chip { position: absolute; width: 7px; height: 6px; background: #dfceb5; border: 1px solid #c2ac90; clip-path: polygon(10% 0,100% 25%,70% 100%,0 70%); }
+@media (prefers-reduced-motion: reduce) { .carving-scene { display: none; } }
+
 /* ===== Design tokens ===== */
 :root {
   --surface: #f7f0e4;
@@ -1706,18 +1714,9 @@ body { background-color: var(--surface); }
   right: -2px;
   bottom: 0;
   width: 16%;
-  background:
-    radial-gradient(circle at 18% 54%, #e0bd78 0 3px, #8a6134 3.5px 6px, transparent 6.5px),
-    linear-gradient(90deg, transparent 12%, rgba(57,36,21,.45) 12.5% 14%, transparent 14.5%),
-    linear-gradient(90deg, transparent 76%, rgba(238,216,184,.12) 77% 79%, transparent 80%),
-    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 7px, rgba(42,25,14,.025) 7px 14px),
-    linear-gradient(105deg, #5a3823, #80583a 48%, #51311f);
-  border: 7px solid #eadfce;
-  border-bottom: 0;
-  box-shadow:
-    inset 0 0 0 2px rgba(48,29,17,.42),
-    inset 13px 0 20px rgba(35,20,11,.2),
-    -10px 0 20px rgba(64,48,33,.14);
+  background: url('images/designer-door-20260915.png') center / 100% 100% no-repeat;
+  border: 0;
+  box-shadow: -6px 0 16px rgba(64,48,33,.12);
 }
 .designer-wall-preview::after {
   display: none;
@@ -2019,7 +2018,7 @@ body { background-color: var(--surface); }
 #catalog .catalog-card { justify-content: center; }
 
 /* Bronze separators aligned with the original catalogue columns. */
-.catalog-process-visual { position: relative; }
+.catalog-process-visual { position: relative; width: calc(100% - 48px); max-width: calc(var(--max-width) - 48px); margin-inline: auto; }
 .catalog-process-divider { position: absolute; top: 55%; bottom: 8.5%; width: 2px; background: #a58b6c; pointer-events: none; }
 /* A single aligned stack for choosing and adding lettering. */
 .designer-section .text-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 8px 0 24px; }
@@ -2063,6 +2062,371 @@ body { background-color: var(--surface); }
 #quote-status { margin: 0; font-size: .9rem; line-height: 1.6; color: var(--ink-soft); }
 #quote-status:empty { display: none; }
 #config-send:disabled { opacity: .65; cursor: wait; }
+#config-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+#config-save svg { flex-shrink: 0; }
 #how-it-works, #customize { scroll-margin-top: 100px; }
 
 #customize { background: #faf7f1; }
+
+/* Keep the choice panel focused; preview actions stay with the design. */
+.designer-section .designer-controls { gap: 0; }
+.designer-preview-actions { display: grid; gap: 12px; padding-top: 20px; }
+.designer-preview-actions .config-actions { justify-content: center; }
+.designer-preview-actions .config-actions-secondary { order: -1; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.designer-preview-actions .designer-send-note,
+.designer-preview-actions .config-disclaimer { margin: 0; text-align: center; }
+.designer-preview-actions #quote-status:empty { display: none; }
+@media (max-width: 760px) {
+  .designer-section .designer-canvas-wrap { position: static; }
+}
+
+/* A single workspace for the preview, choices and shared actions. */
+.designer-section .designer {
+  gap: 0;
+  padding: clamp(16px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f7f0e4;
+  box-shadow: 0 8px 28px rgba(54,43,31,.05);
+}
+.designer-section .designer-canvas-wrap { position: static; min-width: 0; padding-inline-end: 28px; }
+.designer-section .designer-controls { padding: 0 24px; border: 0; border-inline-start: 1px solid var(--line); background: transparent; }
+.designer-section .designer-wall-preview { border-radius: 6px; box-shadow: 0 4px 14px rgba(54,43,31,.08); }
+.designer-section .designer-preview-actions { grid-column: 1 / -1; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.designer-section .designer-preview-actions .config-actions-secondary { padding-bottom: 0; border: 0; }
+.designer-section .designer-preview-actions #config-send { width: auto; min-width: 240px; }
+.designer-preview-actions .designer-send-note,
+.designer-preview-actions .config-disclaimer { max-width: 640px; justify-self: center; }
+@media (max-width: 860px) {
+  .designer-section .designer { grid-template-columns: minmax(0, 1fr); }
+  .designer-section .designer-canvas-wrap { padding: 0; }
+  .designer-section .designer-controls { margin-top: 20px; padding: 8px 0 0; border-inline-start: 0; border-top: 1px solid var(--line); }
+  .designer-section .designer-preview-actions { margin-top: 12px; }
+}
+@media (max-width: 480px) {
+  .designer-section .designer-preview-actions #config-send { width: 100%; min-width: 0; }
+}
+
+/* Compact tools leave the working surface as the main focus. */
+.designer-section .designer { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); }
+.designer-section .designer-controls { padding-inline: 20px 0; }
+.designer-section .designer-category summary { padding-block: 13px; gap: 10px; min-height: 46px; }
+.designer-section .category-content { padding-bottom: 14px; }
+.designer-section .category-content .designer-hint { font-size: .82rem; margin-bottom: 10px; }
+.designer-section .category-content [data-shape] { min-height: 44px; padding: 8px 10px; }
+.designer-section .model-options { gap: 6px; }
+.designer-section .model-option { padding: 7px 4px; font-size: .8rem; }
+.designer-section .model-option img { height: 52px; margin-bottom: 6px; }
+.designer-section .frame-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.designer-section .frame-option { padding: 8px; min-height: 44px; }
+.designer-section .category-content .upload-label { margin-top: 12px; }
+.designer-section .category-content.text-controls { gap: 10px; padding-bottom: 14px; }
+.designer-section .designer-preview-actions { column-gap: 24px; grid-template-columns: minmax(0, 1fr) auto; }
+.designer-section .designer-preview-actions .config-actions-secondary { grid-column: 1; grid-row: 1; justify-content: flex-start; }
+.designer-section .designer-preview-actions > .config-actions:not(.config-actions-secondary) { grid-column: 2; grid-row: 1; }
+.designer-preview-actions .designer-send-note,
+.designer-preview-actions .config-disclaimer,
+.designer-preview-actions #quote-status { grid-column: 1 / -1; }
+@media (max-width: 860px) {
+  .designer-section .designer { grid-template-columns: minmax(0, 1fr); }
+  .designer-section .designer-controls { padding-inline: 0; }
+  .designer-section .designer-preview-actions { grid-template-columns: minmax(0, 1fr); }
+  .designer-section .designer-preview-actions .config-actions-secondary { grid-column: 1; grid-row: auto; justify-content: center; }
+  .designer-section .designer-preview-actions > .config-actions:not(.config-actions-secondary) { grid-column: 1; grid-row: auto; }
+}
+
+/* Put choices above the preview instead of reserving an empty side column. */
+.designer-section .designer { grid-template-columns: minmax(0, 1fr); }
+.designer-section .designer-controls { grid-row: 1; margin: 0 0 20px; padding: 0; border: 0; }
+.designer-section .designer-canvas-wrap { grid-row: 2; padding: 0; }
+.designer-section .designer-accordion { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 12px; }
+.designer-section .designer-category { display: contents; }
+.designer-section .designer-category summary { grid-row: 1; padding: 12px; border-bottom: 2px solid var(--line); }
+.designer-section .designer-category[open] summary { border-bottom-color: var(--bronze); background: #efe4d3; border-radius: 4px 4px 0 0; }
+.designer-section .designer-category .category-content { grid-column: 1 / -1; grid-row: 2; padding: 16px 0 0; }
+.designer-section .designer-category:not([open]) .category-content { display: none; }
+.designer-section .category-content .btn-row { max-width: 400px; }
+.designer-section .model-options { max-width: 460px; }
+.designer-section .frame-options { max-width: 660px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.designer-section .category-content.text-controls { max-width: 460px; width: 100%; }
+.designer-section .designer-wall-preview { max-height: 560px; }
+@media (max-width: 540px) {
+  .designer-section .designer-accordion { column-gap: 4px; }
+  .designer-section .designer-category summary { padding: 10px 4px; gap: 4px; justify-content: center; font-size: .9rem; }
+  .designer-section .category-number { display: none; }
+  .designer-section .frame-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.designer-section .designer-category::details-content { display: contents; }
+.designer-section .designer-category:not([open])::details-content { display: none; }
+
+/* Warm, compact category buttons with a clear selected state. */
+.designer-section .designer-category summary {
+  border: 1px solid #d8c4a7;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #fffdf8, #f3eadc);
+  color: #57432e;
+  box-shadow: 0 2px 4px rgba(70,48,26,.05);
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.designer-section .designer-category[open] summary {
+  border: 1px solid #ae8960;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #ead8be, #e2cba9);
+  color: #4b3520;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 2px 5px rgba(70,48,26,.08);
+}
+.designer-section .category-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(137,103,62,.09);
+  flex-shrink: 0;
+}
+.designer-section .category-toggle { border-radius: 50%; background: rgba(137,103,62,.08); }
+@media (hover: hover) {
+  .designer-section .designer-category summary:hover { border-color: #ae8960; box-shadow: 0 3px 8px rgba(70,48,26,.12); }
+}
+@media (max-width: 540px) {
+  .designer-section .category-number { display: none; }
+  .designer-section .designer-category summary { min-height: 46px; border-radius: 7px; }
+  .designer-section .category-toggle { width: 16px; height: 20px; }
+  .designer-section .category-toggle::before,
+  .designer-section .category-toggle::after { width: 10px; left: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .designer-section .designer-category summary { transition: none; }
+}
+
+/* Editing actions sit directly above the working canvas. */
+.designer-section .designer-edit-toolbar {
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+.designer-edit-toolbar .btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #d8c4a7;
+  border-radius: 7px;
+  background: #fffaf2;
+  color: #57432e;
+  text-decoration: none;
+}
+.designer-edit-toolbar .btn-clear:hover:not(:disabled) { background: #eadcc7; border-color: #ae8960; }
+@media (max-width: 540px) {
+  .designer-edit-toolbar .btn-clear { flex: 1; }
+}
+
+/* Desktop choices open beside the preview without moving it down. */
+@media (min-width: 861px) {
+  .designer-section .designer {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    column-gap: 24px;
+  }
+  .designer-section .designer-canvas-wrap { grid-column: 1; grid-row: 1; min-width: 0; }
+  .designer-section .designer-controls {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+    padding: 0;
+  }
+  .designer-section .designer-accordion { display: flex; flex-direction: column; gap: 10px; }
+  .designer-section .designer-category { display: block; border: 0; }
+  .designer-section .designer-category::details-content { display: block; }
+  .designer-section .designer-category:not([open])::details-content { display: none; }
+  .designer-section .designer-category summary { padding: 11px 12px; }
+  .designer-section .designer-category .category-content {
+    padding: 12px 10px;
+    margin-top: 6px;
+    border: 1px solid #e2d4bf;
+    border-radius: 8px;
+    background: #fcf8f1;
+  }
+  .designer-section .frame-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .designer-section .designer-preview-actions { grid-row: 2; }
+}
+
+/* Keep both desktop surfaces within the same compact working height. */
+@media (min-width: 861px) {
+  .designer-section .designer {
+    --preview-height: clamp(280px, 32vw, 380px);
+    grid-template-columns: minmax(0, 1fr) 280px;
+    max-width: 1000px;
+    margin-inline: auto;
+    padding: 22px;
+    column-gap: 20px;
+  }
+  .designer-section .designer-wall-preview {
+    height: var(--preview-height);
+    max-height: none;
+    aspect-ratio: auto;
+  }
+  .designer-section .designer-controls {
+    /* Align with the wall below the 44px editing toolbar and its 12px gap. */
+    margin-top: 56px;
+    max-height: var(--preview-height);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #b89a74 transparent;
+    padding: 2px 4px 2px 2px;
+    scroll-padding-block: 8px;
+  }
+  .designer-section .designer-accordion { gap: 7px; }
+  .designer-section .designer-category summary { min-height: 44px; padding: 8px 10px; }
+  .designer-section .designer-category .category-content { padding: 10px 8px; }
+}
+
+/* Shared actions directly below the canvas. */
+.designer-section .designer-canvas-wrap .designer-preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+.designer-section .designer-canvas-wrap .designer-preview-actions > .config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.designer-preview-actions #designer-clear,
+.designer-preview-actions #config-save {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #d8c4a7;
+  border-radius: 7px;
+  background: #fffaf2;
+  color: #57432e;
+  text-decoration: none;
+}
+.designer-section .designer-preview-actions #config-send { min-width: 0; min-height: 44px; padding: 10px 18px; border-radius: 7px; }
+.designer-preview-actions #designer-clear:hover,
+.designer-preview-actions #config-save:hover { background: #eadcc7; }
+@media (min-width: 861px) {
+  .designer-section .designer-controls { margin-top: 0; }
+}
+@media (max-width: 540px) {
+  .designer-preview-actions #designer-clear,
+  .designer-preview-actions #config-save { flex: 1; }
+  .designer-section .designer-preview-actions #config-send { width: 100%; }
+}
+
+/* A consistent action bar and accessible custom file picker. */
+.designer-section .designer-canvas-wrap .designer-preview-actions > .config-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 8px;
+  align-items: stretch;
+}
+.designer-section .designer-preview-actions #designer-clear,
+.designer-section .designer-preview-actions #config-save,
+.designer-section .designer-preview-actions #config-send {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: .9rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.designer-section .designer-preview-actions #designer-clear { background: transparent; border-color: transparent; color: var(--ink-soft); }
+.designer-section .designer-preview-actions #config-save { background: #fffaf2; border-color: #cfb999; }
+.designer-section .designer-preview-actions #config-send { background: #89673e; color: #fff; }
+.designer-section .designer-preview-actions #config-send:hover { background: #735331; }
+.designer-section .category-content .designer-upload-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px dashed #b89a74;
+  border-radius: 8px;
+  background: #f3eadc;
+  color: #57432e;
+  cursor: pointer;
+  font-size: .85rem;
+}
+.designer-section .designer-upload-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.designer-upload-button svg { flex-shrink: 0; }
+.designer-section .designer-upload-button:hover { background: #eadcc7; border-color: #89673e; }
+.designer-section .designer-upload-button:focus-within { outline: 2px solid #89673e; outline-offset: 3px; }
+@media (max-width: 540px) {
+  .designer-section .designer-canvas-wrap .designer-preview-actions > .config-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .designer-section .designer-preview-actions #config-send { grid-column: 1 / -1; }
+}
+
+.designer-wall-preview .canvas-clear-button {
+  position: absolute; top: 12px; left: 12px; z-index: 100;
+  min-height: 44px; padding: 8px 14px;
+  border: 1px solid #cdbb9f; border-radius: 8px;
+  background: rgba(255,250,242,.94); color: #57432e;
+  text-decoration: none; box-shadow: 0 2px 6px rgba(54,43,31,.07);
+}
+.designer-wall-preview .canvas-clear-button:hover { background: #eadcc7; }
+.canvas-houseplant {
+  position: absolute; left: 4px; bottom: 0; z-index: 2;
+  width: clamp(65px, 9vw, 108px); height: auto;
+  pointer-events: none;
+}
+.designer-section .designer-canvas-wrap .designer-preview-actions > .config-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+@media (max-width: 540px) {
+  .designer-section .designer-preview-actions #config-send { grid-column: auto; }
+  .designer-wall-preview .canvas-clear-button { top: 8px; left: 8px; padding: 8px 10px; font-size: .8rem; }
+}
+
+/* Photographic hand: white backdrop blends into the plaster surface. */
+.carving-scene { mix-blend-mode: multiply; }
+.carving-tool { width: clamp(105px, 15vw, 160px); transform: translate(-9%, -27%); }
+.carving-tool .carving-swing { display: block; width: 100%; height: auto; transform-origin: 74% 66%; }
+
+/* Keep the hammer opaque and above the revealed wall area. */
+.carving-scene { mix-blend-mode: normal; z-index: 110; }
+.carving-tool { width: clamp(72px, 10vw, 105px); }
+.carving-tool .carving-swing {
+  opacity: 1;
+  clip-path: polygon(5% 27%, 13% 20%, 15% 16%, 23% 10%, 29% 9%, 37% 9%, 43% 11%, 32% 13%, 29% 18%, 31% 23%, 41% 37%, 47% 39%, 51% 43%, 68% 49%, 82% 55%, 100% 46%, 100% 77%, 89% 81%, 87% 77%, 76% 82%, 87% 93%, 88% 97%, 81% 99%, 73% 98%, 67% 84%, 60% 86%, 54% 82%, 50% 78%, 47% 72%, 44% 66%, 44% 62%, 40% 58%, 27% 39%, 22% 29%, 18% 27%, 11% 34%, 8% 34%);
+}
+
+/* Preserve the photographed plant proportions and blend its white backdrop. */
+img.canvas-houseplant { width: clamp(58px, 7.5vw, 85px); height: auto; mix-blend-mode: multiply; }
+
+.shape-dimensions {
+  position: absolute;
+  right: 50%;
+  bottom: -28px;
+  transform: translateX(50%);
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255,250,242,.94);
+  color: #57432e;
+  font-size: .78rem;
+  line-height: 1.3;
+  box-shadow: 0 1px 4px rgba(54,43,31,.12);
+  direction: rtl;
+  pointer-events: none;
+  z-index: 10;
+}
+@media (max-width: 540px) { .shape-dimensions { font-size: .7rem; bottom: -25px; } }

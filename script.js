@@ -119,8 +119,6 @@ lightboxStage.addEventListener("pointerleave", endPointer);
 // ===== Free-canvas designer =====
 const canvasEl = document.getElementById("designer-canvas");
 const emptyHint = document.getElementById("designer-empty-hint");
-const draftNotice = document.getElementById("designer-draft-notice");
-const undoBtn = document.getElementById("config-undo");
 
 let zIndexCounter = 10; // shape/frame are pinned to low z-indexes (always the base tier); everything else starts above them
 let activeLayerEl = null;
@@ -245,6 +243,7 @@ function attachDrag(el, resizeHandles, onResize, isBaseTier) {
       el.style.top = newTop + "px";
       if (onResize) onResize(newWidth, newHeight);
     }
+    if (el.dataset.type === 'shape') fitPaintingsToShape();
   });
 
   function endDrag(e) {
@@ -331,17 +330,42 @@ function addShape(kind, geo) {
     width = Math.min(w, h) * 0.55; height = width;
     left = (w - width) / 2; top = (h - height) / 2;
   } else {
-    width = w * 0.75; height = h * 0.4;
+    // Keep the same surface area as the square, with a calm 3:2 landscape proportion.
+    const squareSide = Math.min(w, h) * 0.55;
+    const area = squareSide * squareSide;
+    const aspect = 70 / 48;
+    width = Math.sqrt(area * aspect);
+    height = area / width;
+    if (width > w * 0.9) { width = w * 0.9; height = area / width; }
+    if (height > h * 0.9) { height = h * 0.9; width = area / height; }
     left = (w - width) / 2; top = (h - height) / 2;
   }
-  const el = createLayerShell("shape", "", inner, null, "shape");
+  const el = createLayerShell("shape", "", inner, (newWidth, newHeight) => {
+    updateShapeDimensions(el, newWidth, newHeight);
+  }, "shape");
   el.dataset.shapeKind = kind;
   el.style.width = width + "px";
   el.style.height = height + "px";
   el.style.left = left + "px";
   el.style.top = top + "px";
+  const dimensions = document.createElement('span');
+  dimensions.className = 'shape-dimensions';
+  dimensions.setAttribute('aria-live', 'polite');
+  el.appendChild(dimensions);
+  updateShapeDimensions(el, width, height);
   if (!isRebuilding) scheduleDraftSave();
   return el;
+}
+
+function updateShapeDimensions(shape, width, height) {
+  if (!shape) return;
+  const canvasWidth = canvasEl.clientWidth || width;
+  const baseSquarePx = Math.min(canvasWidth, canvasEl.clientHeight || width) * 0.55;
+  const pxPerCm = baseSquarePx / 48;
+  const widthCm = width / pxPerCm;
+  const heightCm = height / pxPerCm;
+  const label = shape.querySelector('.shape-dimensions');
+  if (label) label.textContent = `${widthCm.toFixed(1)} × ${heightCm.toFixed(1)} ס״מ`;
 }
 
 document.querySelectorAll("[data-text-style]").forEach((btn) => {
@@ -425,8 +449,7 @@ function addPainting(src, geo) {
 
   if (!geo) {
     img.addEventListener("load", () => {
-      const ratio = img.naturalHeight / img.naturalWidth;
-      el.style.height = (width * ratio) + "px";
+      fitGuidedPainting(el, img);
     });
   }
   if (!isRebuilding) scheduleDraftSave();
@@ -585,17 +608,13 @@ function pushUndo() {
   if (isRebuilding) return;
   undoStack.push(serializeCanvas());
   if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-  undoBtn.disabled = false;
 }
 function undo() {
   if (!undoStack.length) return;
   const prev = undoStack.pop();
   rebuildCanvas(prev);
-  undoBtn.disabled = undoStack.length === 0;
   scheduleDraftSave();
 }
-undoBtn.disabled = true;
-undoBtn.addEventListener("click", undo);
 
 // ---- Draft autosave / restore ----
 function scheduleDraftSave() {
@@ -609,19 +628,13 @@ function scheduleDraftSave() {
   }, 500);
 }
 
-document.getElementById("designer-draft-discard").addEventListener("click", () => {
-  if (canvasEl.querySelector(".layer")) pushUndo();
-  clearCanvasLayers();
-  try { localStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
-  draftNotice.hidden = true;
-});
+
 
 (function loadDraftOnStart() {
   let saved;
   try { saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (err) { saved = null; }
   if (saved && Array.isArray(saved) && saved.length) {
     rebuildCanvas(saved);
-    draftNotice.hidden = false;
   }
 })();
 
@@ -776,29 +789,61 @@ function guidedChange(change) {
   scheduleDraftSave();
   syncGuidedChoices();
 }
+let paintingReveal = null;
+function stopPaintingReveal() {
+  paintingReveal?.cancel();
+  paintingReveal = null;
+}
+function revealPainting(layer, img) {
+  fitGuidedPainting(layer, img);
+  stopPaintingReveal();
+  if (!layer.isConnected || !img.naturalWidth || !img.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  paintingReveal = img.animate([
+    { clipPath: 'inset(0 0 100% 0)', filter: 'grayscale(1) contrast(1.8)', opacity: .3 },
+    { clipPath: 'inset(0 0 0% 0)', filter: 'grayscale(1) contrast(1.3)', opacity: .75, offset: .72 },
+    { clipPath: 'inset(0 0 0% 0)', filter: 'none', opacity: 1 }
+  ], { duration: 1100, easing: 'ease-in-out' });
+}
+canvasEl.addEventListener('pointerdown', stopPaintingReveal, { capture: true });
+['config-save', 'config-send', 'designer-clear'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', stopPaintingReveal, { capture: true });
+});
 function setGuidedModel(model) {
+  stopPaintingReveal();
   const src = `images/paintings/${model}-painting.jpg`;
   const existing = canvasEl.querySelector('.layer[data-type="painting"]');
   if (existing) {
     const img = existing.querySelector('img');
-    img.onload = () => fitGuidedPainting(existing, img);
+    img.onload = () => revealPainting(existing, img);
     img.src = src;
+    if (img.complete && img.naturalWidth) revealPainting(existing, img);
   } else {
     const w = canvasEl.clientWidth, h = canvasEl.clientHeight;
     const layer = addPainting(src, { left: w * .25, top: h * .24, width: w * .5, height: h * .4 });
     const img = layer.querySelector('img');
-    img.onload = () => fitGuidedPainting(layer, img);
-    if (img.complete && img.naturalWidth) fitGuidedPainting(layer, img);
+    img.onload = () => revealPainting(layer, img);
+    if (img.complete && img.naturalWidth) revealPainting(layer, img);
   }
 }
 function fitGuidedPainting(layer, img) {
   if (!layer.isConnected || !img.naturalWidth) return;
   const w = canvasEl.clientWidth, h = canvasEl.clientHeight;
+  const shape = canvasEl.querySelector('.layer[data-type="shape"]');
+  const bounds = shape ? {
+    left: parseFloat(shape.style.left), top: parseFloat(shape.style.top),
+    width: parseFloat(shape.style.width), height: parseFloat(shape.style.height)
+  } : { left: 0, top: 0, width: w, height: h };
   const ratio = img.naturalWidth / img.naturalHeight;
-  const width = Math.min(w * .5, h * .4 * ratio);
+  const width = bounds.width;
   const height = width / ratio;
-  Object.assign(layer.style, { width: width + 'px', height: height + 'px', left: (w - width) / 2 + 'px', top: h * .24 + (h * .4 - height) / 2 + 'px' });
+  Object.assign(layer.style, { width: width + 'px', height: height + 'px', left: bounds.left + (bounds.width - width) / 2 + 'px', top: bounds.top + (bounds.height - height) / 2 + 'px' });
   scheduleDraftSave();
+}
+function fitPaintingsToShape() {
+  canvasEl.querySelectorAll('.layer[data-type="painting"]').forEach(layer => {
+    const img = layer.querySelector('img');
+    if (img) fitGuidedPainting(layer, img);
+  });
 }
 function syncGuidedChoices() {
   const shape = canvasEl.querySelector('.layer[data-type="shape"]');
@@ -819,16 +864,126 @@ document.querySelectorAll('[data-frame]').forEach(button => button.addEventListe
     frameLayerEl = null;
   } else addFrame(button.dataset.frame);
 })));
+let stopCarving = () => {};
+let carvingSequence = 0;
+function animateShapeCarving(shape) {
+  stopCarving();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !shape?.isConnected) return;
+  const wall = canvasEl.closest('.designer-wall-preview');
+  if (!wall || !shape.animate) return;
+  const wallBox = wall.getBoundingClientRect();
+  const box = shape.getBoundingClientRect();
+  const overlay = document.createElement('div');
+  overlay.className = 'carving-scene';
+  overlay.setAttribute('aria-hidden', 'true');
+  Object.assign(overlay.style, {
+    left: `${(box.left - wallBox.left) / wallBox.width * 100}%`,
+    top: `${(box.top - wallBox.top) / wallBox.height * 100}%`,
+    width: `${box.width / wallBox.width * 100}%`,
+    height: `${box.height / wallBox.height * 100}%`
+  });
+  const handFilterId = `hand-white-cleanup-${carvingSequence + 1}`;
+  overlay.innerHTML = `<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><filter id="${handFilterId}" color-interpolation-filters="sRGB"><feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1 -1 -1 0 3"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1"/></feComponentTransfer><feComposite in="SourceGraphic" operator="in"/></filter></defs></svg><div class="carving-tool"><img class="carving-swing" src="images/carving-hand-photo.png" alt="" draggable="false" width="340" height="321" style="filter:url(#${handFilterId})"></div>`;
+  wall.appendChild(overlay);
+  const tool = overlay.querySelector('.carving-tool');
+  const swing = overlay.querySelector('.carving-swing');
+  const inner = shape.querySelector('.layer-shape');
+  const originalClip = inner.style.clipPath;
+  const clipId = `carving-reveal-${++carvingSequence}`;
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  defs.setAttribute('width', '0');
+  defs.setAttribute('height', '0');
+  defs.innerHTML = `<defs><clipPath id="${clipId}" clipPathUnits="objectBoundingBox"></clipPath></defs>`;
+  overlay.appendChild(defs);
+  const clip = defs.querySelector('clipPath');
+  inner.style.clipPath = `url(#${clipId})`;
+  const animations = [];
+  let frameId;
+  let stopped = false;
+  const clean = () => {
+    if (stopped) return;
+    stopped = true;
+    cancelAnimationFrame(frameId);
+    animations.forEach(animation => animation.cancel());
+    inner.style.clipPath = originalClip;
+    overlay.remove();
+    if (stopCarving === clean) stopCarving = () => {};
+  };
+  stopCarving = clean;
+  const duration = 3100;
+  const strikes = [[.23,.2],[.7,.22],[.73,.5],[.27,.5],[.25,.8],[.72,.8]];
+  tool.style.left = `${strikes[0][0] * 100}%`;
+  tool.style.top = `${strikes[0][1] * 100}%`;
+  let nextStrike = 0;
+  let nextImpact = 0;
+  const started = performance.now();
+  function tick(now) {
+    if (stopped) return;
+    if (!shape.isConnected) { clean(); return; }
+    const elapsed = now - started;
+    if (nextStrike < strikes.length && elapsed >= nextStrike * 470) {
+      const [x,y] = strikes[nextStrike++];
+      tool.style.left = `${x * 100}%`;
+      tool.style.top = `${y * 100}%`;
+      animations.push(swing.animate([
+        { transform: 'rotate(0deg)' },
+        { transform: 'rotate(-18deg)', offset: .42, easing: 'cubic-bezier(.6,0,.9,.4)' },
+        { transform: 'rotate(3deg)', offset: .72 },
+        { transform: 'rotate(-4deg)', offset: .85 },
+        { transform: 'rotate(0deg)' }
+      ], { duration: 350, delay: 90, easing: 'ease-in-out' }));
+    }
+    if (nextImpact < strikes.length && elapsed >= nextImpact * 470 + 342) {
+      const [x,y] = strikes[nextImpact++];
+      const patch = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      const vertices = Array.from({length: 20}, (_, i) => {
+        const angle = i / 20 * Math.PI * 2;
+        const radius = .38 + (i % 3) * .026;
+        return `${x + Math.cos(angle) * radius},${y + Math.sin(angle) * radius}`;
+      });
+      patch.setAttribute('points', vertices.join(' '));
+      clip.appendChild(patch);
+      for (let i = 0; i < 7; i++) {
+        const chip = document.createElement('span');
+        chip.className = 'carving-chip';
+        chip.style.left = `${x * 100}%`;
+        chip.style.top = `${y * 100}%`;
+        overlay.appendChild(chip);
+        const flight = chip.animate([
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+          { opacity: .85, offset: .12 },
+          { transform: `translate(${(i-3)*7}px, ${-8-i*2}px) rotate(${i*17}deg)`, opacity: .7, offset: .25 },
+          { transform: `translate(${(i-3)*13}px, ${48+i*8}px) rotate(${i*65}deg)`, opacity: 0 }
+        ], { duration: 520, fill: 'both', easing: 'ease-in' });
+        animations.push(flight);
+        flight.finished.then(() => chip.remove()).catch(() => {});
+      }
+    }
+    if (elapsed >= duration) { clean(); return; }
+    frameId = requestAnimationFrame(tick);
+  }
+  frameId = requestAnimationFrame(tick);
+}
+// Interrupt decorative motion immediately when the user edits or leaves the canvas.
+canvasEl.addEventListener('pointerdown', () => stopCarving(), { capture: true });
+window.addEventListener('resize', () => stopCarving());
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopCarving(); });
+['designer-clear'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', () => stopCarving(), { capture: true });
+});
 document.querySelectorAll('[data-shape]').forEach(button => button.addEventListener('click', () => guidedChange(() => {
+  stopCarving();
   const oldShape = canvasEl.querySelector('.layer[data-type="shape"]');
   if (oldShape) oldShape.remove();
-  addShape(button.dataset.shape);
+  const shape = addShape(button.dataset.shape);
+  fitPaintingsToShape();
   if (frameLayerEl) {
     const kind = frameLayerEl.querySelector('.layer-frame').className.match(/frame-(\w+)/)[1];
     frameLayerEl.remove();
     frameLayerEl = null;
     addFrame(kind);
   }
+  animateShapeCarving(shape);
 })));
 new MutationObserver(syncGuidedChoices).observe(canvasEl, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['src', 'class'] });
 ensureFrameSpacing();
