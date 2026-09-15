@@ -330,14 +330,13 @@ function addShape(kind, geo) {
     width = Math.min(w, h) * 0.55; height = width;
     left = (w - width) / 2; top = (h - height) / 2;
   } else {
-    // Keep the same surface area as the square, with a calm 3:2 landscape proportion.
-    const squareSide = Math.min(w, h) * 0.55;
-    const area = squareSide * squareSide;
-    const aspect = 70 / 48;
-    width = Math.sqrt(area * aspect);
-    height = area / width;
-    if (width > w * 0.9) { width = w * 0.9; height = area / width; }
-    if (height > h * 0.9) { height = h * 0.9; width = area / height; }
+    // Fixed 70cm x 32cm landscape rectangle.
+    const baseSquarePx = Math.min(w, h) * 0.55;
+    const pxPerCm = baseSquarePx / 48;
+    width = 70 * pxPerCm;
+    height = 32 * pxPerCm;
+    if (width > w * 0.9) { const scale = (w * 0.9) / width; width *= scale; height *= scale; }
+    if (height > h * 0.9) { const scale = (h * 0.9) / height; width *= scale; height *= scale; }
     left = (w - width) / 2; top = (h - height) / 2;
   }
   const el = createLayerShell("shape", "", inner, (newWidth, newHeight) => {
@@ -365,7 +364,7 @@ function updateShapeDimensions(shape, width, height) {
   const widthCm = width / pxPerCm;
   const heightCm = height / pxPerCm;
   const label = shape.querySelector('.shape-dimensions');
-  if (label) label.textContent = `${widthCm.toFixed(1)} × ${heightCm.toFixed(1)} ס״מ`;
+  if (label) label.textContent = `${Math.round(widthCm)} × ${Math.round(heightCm)} ס״מ`;
 }
 
 document.querySelectorAll("[data-text-style]").forEach((btn) => {
