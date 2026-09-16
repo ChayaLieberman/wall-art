@@ -116,6 +116,36 @@ lightboxStage.addEventListener("pointerup", endPointer);
 lightboxStage.addEventListener("pointercancel", endPointer);
 lightboxStage.addEventListener("pointerleave", endPointer);
 
+// One recommendation at a time; pause while reading or using the controls.
+(() => {
+  const region = document.getElementById('recommendations');
+  if (!region) return;
+  const deck = region.querySelector('.testimonials-grid');
+  const slides = [...deck.querySelectorAll('.testimonial-card')];
+  const dots = [...region.querySelectorAll('[data-testimonial]')];
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let index = 0;
+  let lastChange = Date.now();
+  function show(next) {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('is-current', i === index);
+      slide.setAttribute('aria-hidden', String(i !== index));
+    });
+    dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
+    lastChange = Date.now();
+  }
+  deck.classList.add('is-carousel');
+  region.querySelector('.testimonials-controls').hidden = false;
+  show(0);
+  dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+  setInterval(() => {
+    if (motion.matches || document.hidden || region.matches(':hover') || Date.now() - lastChange < 7000) return;
+    const box = region.getBoundingClientRect();
+    if (box.bottom > 0 && box.top < window.innerHeight) show(index + 1);
+  }, 7000);
+})();
+
 // ===== Free-canvas designer =====
 const canvasEl = document.getElementById("designer-canvas");
 const emptyHint = document.getElementById("designer-empty-hint");
@@ -330,11 +360,11 @@ function addShape(kind, geo) {
     width = Math.min(w, h) * 0.55; height = width;
     left = (w - width) / 2; top = (h - height) / 2;
   } else {
-    // Fixed 70cm x 32cm landscape rectangle.
+    // Fixed 70cm x 33cm landscape rectangle.
     const baseSquarePx = Math.min(w, h) * 0.55;
     const pxPerCm = baseSquarePx / 48;
     width = 70 * pxPerCm;
-    height = 32 * pxPerCm;
+    height = 33 * pxPerCm;
     if (width > w * 0.9) { const scale = (w * 0.9) / width; width *= scale; height *= scale; }
     if (height > h * 0.9) { const scale = (h * 0.9) / height; width *= scale; height *= scale; }
     left = (w - width) / 2; top = (h - height) / 2;
@@ -538,10 +568,13 @@ document.querySelectorAll(".painting-opt").forEach((btn) => {
 });
 
 document.getElementById("designer-upload").addEventListener("change", (e) => {
+  if (!canvasEl.querySelector('.layer[data-type="shape"]')) { e.target.value = ''; return; }
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => addPainting(reader.result);
+  reader.onload = () => {
+    if (canvasEl.querySelector('.layer[data-type="shape"]')) addPainting(reader.result);
+  };
   reader.readAsDataURL(file);
   e.target.value = "";
 });
@@ -808,6 +841,7 @@ canvasEl.addEventListener('pointerdown', stopPaintingReveal, { capture: true });
   document.getElementById(id)?.addEventListener('click', stopPaintingReveal, { capture: true });
 });
 function setGuidedModel(model) {
+  if (!canvasEl.querySelector('.layer[data-type="shape"]')) return;
   stopPaintingReveal();
   const src = `images/paintings/${model}-painting.jpg`;
   const existing = canvasEl.querySelector('.layer[data-type="painting"]');
@@ -846,9 +880,14 @@ function fitPaintingsToShape() {
 }
 function syncGuidedChoices() {
   const shape = canvasEl.querySelector('.layer[data-type="shape"]');
+  const upload = document.getElementById('designer-upload');
+  upload.disabled = !shape;
+  upload.closest('label').classList.toggle('is-disabled', !shape);
+  document.getElementById('painting-requires-shape').hidden = Boolean(shape);
   document.querySelectorAll('[data-shape]').forEach(button => button.setAttribute('aria-pressed', String(Boolean(shape && shape.dataset.shapeKind === button.dataset.shape))));
   const painting = canvasEl.querySelector('.layer[data-type="painting"] img');
   document.querySelectorAll('[data-model]').forEach(button => {
+    button.disabled = !shape;
     button.setAttribute('aria-pressed', String(Boolean(painting && painting.src.endsWith(`/${button.dataset.model}-painting.jpg`))));
   });
   const frame = canvasEl.querySelector('.layer-frame');
