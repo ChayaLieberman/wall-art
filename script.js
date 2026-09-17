@@ -150,7 +150,7 @@ lightboxStage.addEventListener("pointerleave", endPointer);
 const canvasEl = document.getElementById("designer-canvas");
 const emptyHint = document.getElementById("designer-empty-hint");
 
-let zIndexCounter = 10; // shape/frame are pinned to low z-indexes (always the base tier); everything else starts above them
+let zIndexCounter = 1000; // shape/frame are pinned to low z-indexes (up to 900 for the glass frame); everything else starts safely above the highest frame tier so text and paintings always render on top of any frame
 let activeLayerEl = null;
 let frameLayerEl = null; // only one frame is ever on canvas; a new frame choice restyles it instead of adding another
 let currentTextStyle = "carve";
