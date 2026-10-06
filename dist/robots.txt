@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jerusalem-home.co.il/sitemap.xml
