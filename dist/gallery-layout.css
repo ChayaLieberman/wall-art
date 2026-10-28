@@ -1,25 +1,30 @@
 /* An asymmetric wall of artworks; retain the complete image in every frame. */
+.featured-gallery > .container {
+  max-width: 1440px;
+  padding-inline: clamp(12px, 2vw, 28px);
+}
 .featured-gallery .gallery-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-areas:
-    "a a b c"
-    "a a b c"
-    "d e f f"
-    "d e f f"
-    "h h f f"
-    "h h g g";
-  grid-auto-rows: clamp(110px, 14vw, 165px);
-  gap: clamp(12px, 2vw, 24px);
+    "a a b b c c"
+    "a a b b c c"
+    "d d b b e e"
+    "d d f f e e"
+    "d d f f h h"
+    "g g g g h h"
+    "g g g g h h";
+  grid-auto-rows: clamp(140px, 14.5vw, 220px);
+  gap: clamp(8px, 1vw, 14px);
   align-items: stretch;
 }
 .featured-gallery .gallery-grid .gallery-item {
   aspect-ratio: auto;
   min-height: 0;
   min-width: 0;
-  padding: clamp(6px, 1vw, 12px);
-  background: #eee2cf;
-  border: 1px solid rgba(137, 103, 62, .14);
-  box-shadow: 0 5px 16px rgba(54, 39, 23, .06);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 .featured-gallery .gallery-grid .gallery-item:nth-child(1) { grid-area: a; }
 .featured-gallery .gallery-grid .gallery-item:nth-child(2) { grid-area: b; }
@@ -50,7 +55,7 @@
       "e h"
       "g g";
     grid-auto-rows: clamp(110px, 27vw, 200px);
-    gap: 12px;
+    gap: 8px;
   }
 }
 @media (max-width: 440px) {
@@ -67,7 +72,7 @@
       "e h"
       "g g";
     grid-auto-rows: clamp(76px, 24vw, 106px);
-    gap: 9px;
+    gap: 7px;
   }
-  .featured-gallery .gallery-grid .gallery-item { padding: 4px; }
+  .featured-gallery .gallery-grid .gallery-item { padding: 0; }
 }
