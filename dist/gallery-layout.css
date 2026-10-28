@@ -76,3 +76,9 @@
   }
   .featured-gallery .gallery-grid .gallery-item { padding: 0; }
 }
+
+@media (max-width: 440px) {
+  .featured-gallery .gallery-grid { display: block; }
+  .featured-gallery .gallery-grid .gallery-item { margin-block-end: 10px; }
+  .featured-gallery .gallery-grid .gallery-item img { height: auto; aspect-ratio: auto; }
+}
