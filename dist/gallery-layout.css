@@ -1,7 +1,8 @@
-﻿/* Ordered gallery, with a landscape frame for the Jerusalem panorama. */
+/* Ordered gallery, with a landscape frame for the Jerusalem panorama. */
 .featured-gallery .gallery-grid .gallery-item:nth-child(7) {
-  grid-column: span 2;
+  grid-column: span 1;
   grid-row: auto;
+  align-self: center;
   aspect-ratio: 2 / 1;
 }
 @media (max-width: 440px) {
