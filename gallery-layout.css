@@ -11,8 +11,7 @@
     "d d b b e e"
     "d d f f e e"
     "d d f f h h"
-    "g g g g h h"
-    "g g g g h h";
+    "g g f f h h";
   grid-auto-rows: clamp(140px, 14.5vw, 220px);
   gap: clamp(8px, 1vw, 14px);
   align-items: stretch;
