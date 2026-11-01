@@ -1,0 +1,17 @@
+﻿/* Roomier interactive design workspace. */
+.designer-section > .container { max-width: 1440px; }
+@media (min-width: 861px) {
+  .designer-section .designer {
+    --preview-height: clamp(540px, 48vw, 680px);
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    padding: 18px;
+  }
+}
+@media (max-width: 860px) {
+  .designer-section .designer-wall-preview {
+    height: clamp(400px, 70vw, 600px);
+    max-height: none;
+    aspect-ratio: auto;
+  }
+}
