@@ -320,11 +320,15 @@ img {
 .hero-contact-details svg { width: 15px; height: 15px; color: var(--bronze); flex: none; }
 .hero-contact-details a:hover { color: var(--bronze); text-decoration: underline; text-underline-offset: 4px; }
 .hero-artwork { margin: 0; min-width: 0; }
-.hero-photo-wrap { background: #e8ddcc; padding: clamp(12px, 1.8vw, 24px); }
+.hero-photo-wrap { background: none; padding: 0; }
 .hero-img {
-  width: 100%;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 85vh;
+  margin-inline: auto;
   height: auto;
-  aspect-ratio: 1;
+  aspect-ratio: auto;
   object-fit: contain;
 }
 .hero-artwork figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 16px; font-size: 0.8rem; color: #625e56; }
@@ -1566,7 +1570,7 @@ body { background-color: var(--surface); }
   content: ''; position: absolute; inset: 0; z-index: -1;
   background: linear-gradient(rgba(247,240,228,.92), rgba(247,240,228,.92)), url('images/catalog-plaster-texture.jpg') center / 620px auto repeat;
 }
-.hero-photo-wrap { background: #d8c2a2; padding: clamp(10px, 1.5vw, 20px); }
+.hero-photo-wrap { background: none; padding: 0; }
 .hero-kicker, .eyebrow { letter-spacing: .06em; }
 .about-section, .how-it-works { background: #eadcc7; }
 .about-media img, .featured-gallery .gallery-item img, .contact-photo img { filter: sepia(.1) saturate(.83) contrast(1.03); }
