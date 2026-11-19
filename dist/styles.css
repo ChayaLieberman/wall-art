@@ -331,6 +331,7 @@ img {
   aspect-ratio: auto;
   object-fit: contain;
 }
+@media (min-width: 761px) { .hero-img { translate: clamp(16px, 3vw, 48px) 0; } }
 .hero-artwork figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 16px; font-size: 0.8rem; color: #625e56; }
 .hero-artwork figcaption > span:first-child { color: #292824; font-weight: 600; }
 .hero-actions {
