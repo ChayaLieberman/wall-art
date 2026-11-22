@@ -1,13 +1,40 @@
 /* Ordered gallery, with a landscape frame for the Jerusalem panorama. */
-.featured-gallery .gallery-grid .gallery-item:nth-child(7) {
+.featured-gallery .gallery-grid .gallery-item[data-full="images/jerusalem-built.png"] {
   grid-column: span 1;
   grid-row: auto;
   align-self: center;
   aspect-ratio: 2 / 1;
 }
 @media (max-width: 440px) {
-  .featured-gallery .gallery-grid .gallery-item:nth-child(7) {
+  .featured-gallery .gallery-grid .gallery-item[data-full="images/jerusalem-built.png"] {
     grid-column: auto;
     aspect-ratio: 2 / 1;
+  }
+}
+
+/* These photos are a touch off their tile ratio: fill the tile so no thin side bars show. */
+.featured-gallery .gallery-grid .gallery-item[data-full="images/temple-and-jerusalem.jpg"] img,
+.featured-gallery .gallery-grid .gallery-item[data-full="images/jerusalem-built.png"] img,
+.featured-gallery .gallery-grid .gallery-item[data-full="images/plain-with-text.jpg"] img,
+.featured-gallery .gallery-grid .gallery-item[data-full="images/tower-david-carved-frame.jpg"] img,
+.featured-gallery .gallery-grid .gallery-item[data-full="images/tower-david-catalog-hd.png"] img,
+.featured-gallery .gallery-grid .gallery-item[data-full="images/glass-cladding.jpg"] img {
+  object-fit: cover;
+}
+
+/* Desktop: 4 tiles per row; the Jerusalem panorama takes the width of two tiles and the height of one row. */
+@media (min-width: 761px) {
+  .featured-gallery .gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .featured-gallery .gallery-grid .gallery-item[data-full="images/jerusalem-built.png"] {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    align-self: stretch;
+  }
+  /* Take the image out of flow so the row height comes from the square tiles, not the panorama. */
+  .featured-gallery .gallery-grid .gallery-item[data-full="images/jerusalem-built.png"] img {
+    position: absolute;
+    inset: 0;
   }
 }
