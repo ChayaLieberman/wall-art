@@ -123,9 +123,9 @@ lightboxStage.addEventListener("pointerleave", endPointer);
   const deck = region.querySelector('.testimonials-grid');
   const slides = [...deck.querySelectorAll('.testimonial-card')];
   const dots = [...region.querySelectorAll('[data-testimonial]')];
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const ROTATE_SECONDS = 7;
   let index = 0;
-  let lastChange = Date.now();
+  let shownFor = 0; // seconds the current recommendation has been on screen
   function show(next) {
     index = (next + slides.length) % slides.length;
     slides.forEach((slide, i) => {
@@ -133,17 +133,20 @@ lightboxStage.addEventListener("pointerleave", endPointer);
       slide.setAttribute('aria-hidden', String(i !== index));
     });
     dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
-    lastChange = Date.now();
+    shownFor = 0;
   }
   deck.classList.add('is-carousel');
   region.querySelector('.testimonials-controls').hidden = false;
   show(0);
   dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+  // Count only time the section is actually visible, then advance every 7 seconds.
   setInterval(() => {
-    if (motion.matches || document.hidden || region.matches(':hover') || Date.now() - lastChange < 7000) return;
+    if (document.hidden) return;
     const box = region.getBoundingClientRect();
-    if (box.bottom > 0 && box.top < window.innerHeight) show(index + 1);
-  }, 7000);
+    if (box.bottom <= 0 || box.top >= window.innerHeight) return;
+    shownFor += 1;
+    if (shownFor >= ROTATE_SECONDS) show(index + 1);
+  }, 1000);
 })();
 
 // ===== Free-canvas designer =====
