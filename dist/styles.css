@@ -2512,7 +2512,7 @@ body { background-color: var(--surface); }
 .testimonial-card.has-photo p, .testimonial-card.has-photo figcaption { text-shadow: 0 0 6px rgba(252, 246, 236, .95), 0 0 14px rgba(252, 246, 236, .8); }
 .is-carousel .testimonial-card.is-long p { font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.75; max-width: 640px; }
 /* Push the quote toward the bottom when the engraving sits in the middle of the photo. */
-.is-carousel .testimonial-card.text-low { justify-content: flex-end; }
+.is-carousel .testimonial-card.text-low { justify-content: flex-end; padding-bottom: 56px; }
 .is-carousel .testimonial-card.text-low p { font-weight: 600; color: #3f2f1f; }
 /* No decorative quote marks on testimonials. */
 .is-carousel .testimonial-card::after { content: none; }
