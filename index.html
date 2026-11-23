@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;600;700&family=David+Libre:wght@500;700&family=Assistant:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261123-11">
+  <link rel="stylesheet" href="styles.css?v=20261123-15">
   <link rel="stylesheet" href="designer-workspace.css?v=20261123-2">
   <link rel="stylesheet" href="gallery-layout.css?v=20261122-10">
   <link rel="icon" type="image/jpeg" href="images/temple.jpg">
@@ -92,6 +92,22 @@
       </div>
     </section>
 
+    <!-- VIDEO -->
+    <section class="section video-section" id="video" aria-label="סרטונים מהעבודה">
+      <div class="container">
+        <div class="video-thumbs">
+          <button class="video-thumb" type="button" data-video="videos/work-video.mp4?v=2" aria-label="הפעלת הסרטון עד שיבוא משיח">
+            <img src="images/video-poster.jpg?v=2" alt="" loading="lazy">
+            <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </button>
+          <button class="video-thumb" type="button" data-video="videos/jerusalem-video.mp4" aria-label="הפעלת הסרטון אם אשכחך ירושלים">
+            <img src="images/video-poster-2.jpg" alt="" loading="lazy">
+            <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- GALLERY -->
     <section class="section featured-gallery" id="gallery" aria-labelledby="gallery-title">
       <div class="container">
@@ -137,6 +153,7 @@
         </div>
       </div>
     </section>
+
 
     <!-- CATALOG -->
     <section class="section" id="catalog">
@@ -355,27 +372,6 @@
 
 
 
-    <!-- VIDEO -->
-    <section class="section section-alt" id="video" hidden>
-      <div class="container">
-        <div class="section-head">
-          <span class="eyebrow">בקרוב</span>
-          <h2>סרטון הדגמה</h2>
-          <p>בקרוב יעלה כאן סרטון שמראה את תהליך החריטה בקיר מקרוב.</p>
-        </div>
-        <div class="video-frame">
-          <div class="video-placeholder">
-            <div class="play-badge">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-            <strong>הסרטון בהכנה</strong>
-            <span>יעודכן כאן בקרוב</span>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="section testimonials-section" id="recommendations" aria-labelledby="recommendations-title">
       <div class="container">
@@ -490,7 +486,11 @@
   </div>
 
 
-  <script src="script.js?v=20261123-4"></script>
+  <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="צפייה בסרטון" hidden>
+    <button class="video-modal-close" type="button" aria-label="סגירת הסרטון">&times;</button>
+    <video controls playsinline></video>
+  </div>
+  <script src="script.js?v=20261123-5"></script>
 </body>
 
 </html>

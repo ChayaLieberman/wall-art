@@ -149,6 +149,38 @@ lightboxStage.addEventListener("pointerleave", endPointer);
   }, 1000);
 })();
 
+// Work videos: a thumbnail opens its video in a full-screen overlay.
+(() => {
+  const modal = document.getElementById("video-modal");
+  const thumbs = document.querySelectorAll(".video-thumb[data-video]");
+  if (!modal || !thumbs.length) return;
+  const player = modal.querySelector("video");
+  const closeBtn = modal.querySelector(".video-modal-close");
+  let opener = null;
+  function open(thumb) {
+    opener = thumb;
+    player.src = thumb.dataset.video;
+    modal.hidden = false;
+    document.body.classList.add("video-open");
+    closeBtn.focus();
+    const playing = player.play();
+    if (playing && playing.catch) playing.catch(() => {});
+  }
+  function close() {
+    if (modal.hidden) return;
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+    modal.hidden = true;
+    document.body.classList.remove("video-open");
+    if (opener) opener.focus();
+  }
+  thumbs.forEach((thumb) => thumb.addEventListener("click", () => open(thumb)));
+  closeBtn.addEventListener("click", close);
+  modal.addEventListener("click", (event) => { if (event.target === modal) close(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+})();
+
 // ===== Free-canvas designer =====
 const canvasEl = document.getElementById("designer-canvas");
 const emptyHint = document.getElementById("designer-empty-hint");
