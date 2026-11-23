@@ -2,7 +2,7 @@
 .designer-section > .container { max-width: 1440px; }
 @media (min-width: 861px) {
   .designer-section .designer {
-    --preview-height: clamp(540px, 48vw, 680px);
+    --preview-height: clamp(400px, 36vw, 500px);
     max-width: 100%;
     grid-template-columns: minmax(0, 1fr) 280px;
     padding: 18px;
@@ -15,3 +15,6 @@
     aspect-ratio: auto;
   }
 }
+
+/* Text always sits above every other layer, including paintings and the glass frame. */
+.designer-canvas .layer[data-type="text"] { z-index: 100000 !important; }

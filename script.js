@@ -159,6 +159,8 @@ let isRebuilding = false; // true while restoring a saved/undo state, so those r
 let draftSaveTimer = null;
 const UNDO_LIMIT = 40;
 const DRAFT_KEY = "amaDesignerDraft";
+// Default square side as a share of the canvas's shorter side; it is also the 48cm reference for the size label.
+const SHAPE_FRACTION = 0.4;
 const frameGap = (width, height) => Math.max(20, Math.min(width, height) * 0.07);
 
 function updateEmptyHint() {
@@ -357,11 +359,11 @@ function addShape(kind, geo) {
   if (geo) {
     ({ width, height, left, top } = geo);
   } else if (kind === "square") {
-    width = Math.min(w, h) * 0.55; height = width;
+    width = Math.min(w, h) * SHAPE_FRACTION; height = width;
     left = (w - width) / 2; top = (h - height) / 2;
   } else {
     // Fixed 70cm x 33cm landscape rectangle.
-    const baseSquarePx = Math.min(w, h) * 0.55;
+    const baseSquarePx = Math.min(w, h) * SHAPE_FRACTION;
     const pxPerCm = baseSquarePx / 48;
     width = 70 * pxPerCm;
     height = 33 * pxPerCm;
@@ -389,7 +391,7 @@ function addShape(kind, geo) {
 function updateShapeDimensions(shape, width, height) {
   if (!shape) return;
   const canvasWidth = canvasEl.clientWidth || width;
-  const baseSquarePx = Math.min(canvasWidth, canvasEl.clientHeight || width) * 0.55;
+  const baseSquarePx = Math.min(canvasWidth, canvasEl.clientHeight || width) * SHAPE_FRACTION;
   const pxPerCm = baseSquarePx / 48;
   const widthCm = width / pxPerCm;
   const heightCm = height / pxPerCm;
@@ -432,7 +434,8 @@ function addText(text, style, geo) {
   if (geo) {
     ({ width, height, left, top } = geo);
   } else {
-    width = Math.min(w * 0.5, 260); height = 64;
+    // Scale the default text box with the canvas (64px tall on a ~580px-high canvas).
+    height = Math.max(40, h * 0.11); width = Math.min(w * 0.5, height * 4.06);
     left = (w - width) / 2; top = (h - height) / 2;
   }
 
@@ -443,6 +446,7 @@ function addText(text, style, geo) {
   el.style.height = height + "px";
   el.style.left = left + "px";
   el.style.top = top + "px";
+  inner.style.fontSize = Math.max(12, height * 0.42) + "px";
 
   if (!geo && !isRebuilding) {
     setActiveLayer(el);
@@ -466,7 +470,7 @@ function addPainting(src, geo) {
   if (geo) {
     ({ width, height, left, top } = geo);
   } else {
-    width = w * 0.42; height = width * 0.5;
+    width = w * 0.31; height = width * 0.5;
     left = (w - width) / 2; top = (h - height) / 2;
   }
 
@@ -495,7 +499,7 @@ function createFrameLayer(kind, geo) {
   } else {
     const shapeEl = canvasEl.querySelector('.layer[data-type="shape"]');
     if (shapeEl) {
-      const sw = parseFloat(shapeEl.style.width) || w * 0.55;
+      const sw = parseFloat(shapeEl.style.width) || w * SHAPE_FRACTION;
       const sh = parseFloat(shapeEl.style.height) || h * 0.4;
       const sl = parseFloat(shapeEl.style.left) || 0;
       const st = parseFloat(shapeEl.style.top) || 0;
@@ -681,11 +685,9 @@ async function exportDesignCanvas() {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, outW, outH);
 
-  const layers = [...canvasEl.querySelectorAll(".layer")].sort((a, b) => {
-    const aGlass = a.dataset.type === "frame" && a.querySelector(".frame-glass");
-    const bGlass = b.dataset.type === "frame" && b.querySelector(".frame-glass");
-    return Number(aGlass) - Number(bGlass);
-  });
+  // Draw order matches the screen: glass frame above paintings, and text above everything.
+  const drawRank = (el) => el.dataset.type === "text" ? 2 : (el.dataset.type === "frame" && el.querySelector(".frame-glass") ? 1 : 0);
+  const layers = [...canvasEl.querySelectorAll(".layer")].sort((a, b) => drawRank(a) - drawRank(b));
   for (const layer of layers) {
     const x = parseFloat(layer.style.left) * scale;
     const y = parseFloat(layer.style.top) * scale;
