@@ -2516,3 +2516,18 @@ body { background-color: var(--surface); }
 .is-carousel .testimonial-card.text-low p { font-weight: 600; color: #3f2f1f; }
 /* No decorative quote marks on testimonials. */
 .is-carousel .testimonial-card::after { content: none; }
+
+/* Halacha: tighter spacing so the section takes less room. */
+#halacha { padding-block: clamp(40px, 5vw, 64px); }
+#halacha .section-head { margin-bottom: 26px; }
+#halacha .halacha-intro { margin-top: 12px; }
+#halacha .halacha-spec { padding: 0 0 16px; margin: 0 0 16px; }
+#halacha .halacha-spec h3 { margin-bottom: 4px; }
+#halacha .halacha-spec p { line-height: 1.7; }
+#halacha .halacha-sources { margin-top: 4px; }
+#halacha .halacha-sources summary { padding: 14px 0; }
+#halacha .halacha-attribution { margin-top: 12px; }
+@media (max-width: 720px) {
+  #halacha .section-head { margin-bottom: 20px; }
+  #halacha .halacha-spec { padding: 0 0 14px; margin-bottom: 14px; }
+}
