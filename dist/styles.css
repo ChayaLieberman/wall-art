@@ -2531,10 +2531,3 @@ body { background-color: var(--surface); }
   #halacha .section-head { margin-bottom: 20px; }
   #halacha .halacha-spec { padding: 0 0 14px; margin-bottom: 14px; }
 }
-
-/* Work video: one centered 16:9 player. */
-.video-section { padding-block: clamp(32px, 5vw, 64px); }
-.video-section .section-head { text-align: center; max-width: none; margin-bottom: 24px; }
-.video-frame { max-width: 900px; margin-inline: auto; border-radius: 10px; overflow: hidden; background: #1d1915; box-shadow: 0 10px 30px rgba(70, 48, 26, .12); }
-.video-frame { display: block; aspect-ratio: auto; border: 0; }
-.video-frame video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #1d1915; }
